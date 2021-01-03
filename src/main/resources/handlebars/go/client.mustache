@@ -33,21 +33,6 @@ var (
 // In most cases there should be only one, shared, APIClient.
 type APIClient struct {
 	cfg    *Configuration
-	common service // Reuse a single struct instead of allocating one for each service on the heap.
-
-	// API Services
-{{#apiInfo}}
-{{#apis}}
-{{#operations}}
-
-	{{classname}} *{{classname}}Service
-{{/operations}}
-{{/apis}}
-{{/apiInfo}}
-}
-
-type service struct {
-	client *APIClient
 }
 
 // NewAPIClient creates a new API client. Requires a userAgent string describing your application.
@@ -57,20 +42,7 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 		cfg.HTTPClient = http.DefaultClient
 	}
 
-	c := &APIClient{}
-	c.cfg = cfg
-	c.common.client = c
-
-{{#apiInfo}}
-	// API Services
-{{#apis}}
-{{#operations}}
-	c.{{classname}} = (*{{classname}}Service)(&c.common)
-{{/operations}}
-{{/apis}}
-{{/apiInfo}}
-
-	return c
+	return &APIClient{cfg: cfg}
 }
 
 func atoi(in string) (int, error) {
