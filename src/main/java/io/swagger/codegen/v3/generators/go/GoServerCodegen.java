@@ -18,7 +18,6 @@ public class GoServerCodegen extends AbstractGoCodegen {
     protected String apiVersion = "1.0.0";
     protected int serverPort = 8080;
     protected String projectName = "swagger-server";
-    protected String apiPath = "go";
 
     public GoServerCodegen() {
         super();
@@ -86,7 +85,6 @@ public class GoServerCodegen extends AbstractGoCodegen {
          */
         additionalProperties.put("apiVersion", apiVersion);
         additionalProperties.put("serverPort", serverPort);
-        additionalProperties.put("apiPath", apiPath);
         additionalProperties.put(CodegenConstants.PACKAGE_NAME, packageName);
 
         modelPackage = packageName;
@@ -98,16 +96,11 @@ public class GoServerCodegen extends AbstractGoCodegen {
          * it will be processed by the template engine.  Otherwise, it will be copied
          */
         supportingFiles.add(new SupportingFile("swagger.mustache", "api", "swagger.yaml"));
-        supportingFiles.add(new SupportingFile("Dockerfile", "", "Dockerfile"));
-        supportingFiles.add(new SupportingFile("main.mustache", "", "main.go"));
-        supportingFiles.add(new SupportingFile("routers.mustache", apiPath, "routers.go"));
-        supportingFiles.add(new SupportingFile("logger.mustache", apiPath, "logger.go"));
-        writeOptional(outputFolder, new SupportingFile("README.mustache", apiPath, "README.md"));
-    }
-
-    @Override
-    public String apiPackage() {
-        return apiPath;
+        supportingFiles.add(new SupportingFile("Dockerfile", "extra", "Dockerfile"));
+        supportingFiles.add(new SupportingFile("main.mustache", "extra", "main.go"));
+	supportingFiles.add(new SupportingFile("routers.mustache", "", "routers.go"));
+        supportingFiles.add(new SupportingFile("logger.mustache", "", "logger.go"));
+        writeOptional(outputFolder, new SupportingFile("README.mustache", "", "README-server.md"));
     }
 
     /**
@@ -150,11 +143,11 @@ public class GoServerCodegen extends AbstractGoCodegen {
      */
     @Override
     public String apiFileFolder() {
-        return outputFolder + File.separator + apiPackage().replace('.', File.separatorChar);
+	return  String.join(File.separator, outputFolder);
     }
 
     @Override
     public String modelFileFolder() {
-        return outputFolder + File.separator + apiPackage().replace('.', File.separatorChar);
+        return String.join(File.separator, outputFolder);
     }
 }
