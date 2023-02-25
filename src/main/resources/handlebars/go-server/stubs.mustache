@@ -1,0 +1,39 @@
+{{>partial_header}}
+package {{packageName}}
+{{#apiInfo}}
+
+import (
+	"net/http"
+)
+
+// This file should contain a full set of stub handlers for your web
+// server application. If it does, then you can just copy this file
+// into your application and start replacing the stubs with real code.
+
+// swagger-codegen has an interesting "feature" where API information is
+// not available to supporting files if you aren't also generating the
+// APIs at the same time. In that case this file will contain no
+// functions at all and you will need to copy and paste the stub handler
+// from the comment below into your code. The function names you need to
+// use are whatever undefined errors you get from compiling all the
+// api_X.go files.
+
+/*
+
+func STUB_HANDLER(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+}
+
+*/{{#apis}}
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// API stubs for the {{classname}} API group
+//
+////////////////////////////////////////////////////////////////////////////////{{#operations}}{{#operation}}
+
+func {{nickname}}(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+}{{/operation}}{{/operations}}{{/apis}}{{/apiInfo}}
