@@ -1,12 +1,18 @@
 {{>partial_header}}
 package {{packageName}}
 
-{{#operations}}
-import (
-	"net/http"
-){{#operation}}
+{{#operations}}// Register this API group with the central router in router.go.
+func init() {
+	swaggerRoutes = append(swaggerRoutes, swagger{{classname}}Routes)
+}
 
-func {{nickname}}(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-}{{/operation}}{{/operations}}
+var swagger{{classname}}Routes = []swaggerRoute{
+{{#operation}}
+	swaggerRoute{
+		"{{operationId}}",
+		"{{httpMethod}}",
+		"{{{basePathWithoutHost}}}{{{path}}}",
+		{{operationId}},
+	},{{/operation}}
+}
+{{/operations}}
