@@ -1,24 +1,23 @@
 {{>partial_header}}
 package main
 
+// This is a sample main function.
+//
+// You can compile it and the server API code from the output
+// directory with the command "go build extra/main.go". This will give
+// you and executable file in the output directory called "main".
+
 import (
 	"log"
 	"net/http"
 
-	// WARNING!
-	// Change this to a fully-qualified import path
-	// once you place this file into your project.
-	// For example,
-	//
-	//    sw "github.com/myname/myrepo/{{apiPath}}"
-	//
-	sw "./{{apiPath}}"
+	"{{packageName}}"
 )
 
 func main() {
 	log.Printf("Server started")
 
-	router := sw.NewRouter()
+	router := {{packageName}}.NewRouter()
 
 	log.Fatal(http.ListenAndServe(":{{serverPort}}", router))
 }
