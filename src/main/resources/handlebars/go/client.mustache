@@ -432,11 +432,13 @@ func strlen(s string) int {
 	return utf8.RuneCountInString(s)
 }
 
-// GenericSwaggerError Provides access to the body, error and model on returned errors.
+// GenericSwaggerError provides access to the body, error, model and
+// HTTP response on returned errors.
 type GenericSwaggerError struct {
-	body  []byte
-	error string
-	model interface{}
+	body     []byte
+	error    string
+	model    interface{}
+	response *http.Response
 }
 
 // Error returns non-empty string if there was an error.
@@ -452,4 +454,9 @@ func (e GenericSwaggerError) Body() []byte {
 // Model returns the unpacked model of the error
 func (e GenericSwaggerError) Model() interface{} {
 	return e.model
+}
+
+// Response returns a pointer to the http.Response that caused the error.
+func (e GenericSwaggerError) Response() *http.Response {
+	return e.response
 }

@@ -6,7 +6,6 @@ package {{packageName}}
 import (
 	"context"
 	"io/ioutil"
-	"net/http"
 	"net/url"
 	"strings"
 {{#imports}}	"{{import}}"
@@ -57,7 +56,7 @@ type {{{classname}}}{{{nickname}}}Opts struct {
 }
 
 {{/hasOptionalParams}}
-func (a *{{{classname}}}Service) {{{nickname}}}(ctx context.Context{{#hasParams}}, {{/hasParams}}{{#parameters}}{{#required}}{{paramName}} {{{dataType}}}{{#hasMore}}, {{/hasMore}}{{/required}}{{/parameters}}{{#hasOptionalParams}}localVarOptionals *{{{classname}}}{{{nickname}}}Opts{{/hasOptionalParams}}) ({{#returnType}}{{{returnType}}}, {{/returnType}}*http.Response, error) {
+func (a *{{{classname}}}Service) {{{nickname}}}(ctx context.Context{{#hasParams}}, {{/hasParams}}{{#parameters}}{{#required}}{{paramName}} {{{dataType}}}{{#hasMore}}, {{/hasMore}}{{/required}}{{/parameters}}{{#hasOptionalParams}}localVarOptionals *{{{classname}}}{{{nickname}}}Opts{{/hasOptionalParams}}) ({{#returnType}}{{{returnType}}}, {{/returnType}}error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("{{httpMethod}}")
 		localVarPostBody   interface{}
@@ -77,22 +76,22 @@ func (a *{{{classname}}}Service) {{{nickname}}}(ctx context.Context{{#hasParams}
 	{{#required}}
 	{{#minItems}}
 	if len({{paramName}}) < {{minItems}} {
-		return {{#returnType}}localVarReturnValue, {{/returnType}}nil, reportError("{{paramName}} must have at least {{minItems}} elements")
+		return {{#returnType}}localVarReturnValue, {{/returnType}}reportError("{{paramName}} must have at least {{minItems}} elements")
 	}
 	{{/minItems}}
 	{{#maxItems}}
 	if len({{paramName}}) > {{maxItems}} {
-		return {{#returnType}}localVarReturnValue, {{/returnType}}nil, reportError("{{paramName}} must have less than {{maxItems}} elements")
+		return {{#returnType}}localVarReturnValue, {{/returnType}}reportError("{{paramName}} must have less than {{maxItems}} elements")
 	}
 	{{/maxItems}}
 	{{#minLength}}
 	if strlen({{paramName}}) < {{minLength}} {
-		return {{#returnType}}localVarReturnValue, {{/returnType}}nil, reportError("{{paramName}} must have at least {{minLength}} elements")
+		return {{#returnType}}localVarReturnValue, {{/returnType}}reportError("{{paramName}} must have at least {{minLength}} elements")
 	}
 	{{/minLength}}
 	{{#maxLength}}
 	if strlen({{paramName}}) > {{maxLength}} {
-		return {{#returnType}}localVarReturnValue, {{/returnType}}nil, reportError("{{paramName}} must have less than {{maxLength}} elements")
+		return {{#returnType}}localVarReturnValue, {{/returnType}}reportError("{{paramName}} must have less than {{maxLength}} elements")
 	}
 	{{/maxLength}}
 	{{#minimum}}
@@ -103,7 +102,7 @@ func (a *{{{classname}}}Service) {{{nickname}}}(ctx context.Context{{#hasParams}
 	{{^isString}}
 	if {{paramName}} < {{minimum}} {
 	{{/isString}}
-		return {{#returnType}}localVarReturnValue, {{/returnType}}nil, reportError("{{paramName}} must be greater than {{minimum}}")
+		return {{#returnType}}localVarReturnValue, {{/returnType}}reportError("{{paramName}} must be greater than {{minimum}}")
 	}
 	{{/minimum}}
 	{{#maximum}}
@@ -114,7 +113,7 @@ func (a *{{{classname}}}Service) {{{nickname}}}(ctx context.Context{{#hasParams}
 	{{^isString}}
 	if {{paramName}} > {{maximum}} {
 	{{/isString}}
-		return {{#returnType}}localVarReturnValue, {{/returnType}}nil, reportError("{{paramName}} must be less than {{maximum}}")
+		return {{#returnType}}localVarReturnValue, {{/returnType}}reportError("{{paramName}} must be less than {{maximum}}")
 	}
 	{{/maximum}}
 	{{/required}}
@@ -177,7 +176,7 @@ func (a *{{{classname}}}Service) {{{nickname}}}(ctx context.Context{{#hasParams}
 		localVarFileOk := false
 		localVarFile, localVarFileOk = localVarOptionals.{{vendorExtensions.x-exportParamName}}.Value().({{dataType}})
 		if !localVarFileOk {
-				return {{#returnType}}localVarReturnValue, {{/returnType}}nil, reportError("{{paramName}} should be {{dataType}}")
+				return {{#returnType}}localVarReturnValue, {{/returnType}}reportError("{{paramName}} should be {{dataType}}")
 		}
 	}
 {{/required}}
@@ -233,26 +232,37 @@ func (a *{{{classname}}}Service) {{{nickname}}}(ctx context.Context{{#hasParams}
 {{/authMethods}}
 	r, err := a.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 	if err != nil {
-		return {{#returnType}}localVarReturnValue, {{/returnType}}nil, err
+		return {{#returnType}}localVarReturnValue, {{/returnType}}err
 	}
 
 	localVarHttpResponse, err := a.callAPI(r)
 	if err != nil || localVarHttpResponse == nil {
-		return {{#returnType}}localVarReturnValue, {{/returnType}}localVarHttpResponse, err
+		return {{#returnType}}localVarReturnValue, {{/returnType}}GenericSwaggerError {
+			body: nil,
+			model: nil,
+			error: err.Error(),
+			response: localVarHttpResponse,
+		}
 	}
 
 	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
 	localVarHttpResponse.Body.Close()
 	if err != nil {
-		return {{#returnType}}localVarReturnValue, {{/returnType}}localVarHttpResponse, err
+		return {{#returnType}}localVarReturnValue, {{/returnType}}err
 	}
 
 	{{#returnType}}
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return {{#returnType}}localVarReturnValue, {{/returnType}}localVarHttpResponse, err
+		if err == nil {
+			newErr := GenericSwaggerError{
+				body: localVarBody,
+				model: localVarReturnValue,
+				error: err.Error(),
+				response: localVarHttpResponse,
+			}
+			return {{#returnType}}localVarReturnValue, {{/returnType}}newErr
 		}
 	}
 	{{/returnType}}
@@ -261,6 +271,7 @@ func (a *{{{classname}}}Service) {{{nickname}}}(ctx context.Context{{#hasParams}
 		newErr := GenericSwaggerError{
 			body: localVarBody,
 			error: localVarHttpResponse.Status,
+			response: localVarHttpResponse,
 		}
 		{{#responses}}{{#dataType}}
 		if localVarHttpResponse.StatusCode == {{{code}}} {
@@ -268,15 +279,15 @@ func (a *{{{classname}}}Service) {{{nickname}}}(ctx context.Context{{#hasParams}
 			err = a.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
 				if err != nil {
 					newErr.error = err.Error()
-					return {{#returnType}}localVarReturnValue, {{/returnType}}localVarHttpResponse, newErr
+					return {{#returnType}}localVarReturnValue, {{/returnType}}newErr
 				}
 				newErr.model = v
-				return {{#returnType}}localVarReturnValue, {{/returnType}}localVarHttpResponse, newErr
+				return {{#returnType}}localVarReturnValue, {{/returnType}}newErr
 		}
 		{{/dataType}}{{/responses}}
-		return {{#returnType}}localVarReturnValue, {{/returnType}}localVarHttpResponse, newErr
+		return {{#returnType}}localVarReturnValue, {{/returnType}}newErr
 	}
 
-	return {{#returnType}}localVarReturnValue, {{/returnType}}localVarHttpResponse, nil
+	return {{#returnType}}localVarReturnValue, {{/returnType}}nil
 }
 {{/@first}}{{/contents}}{{/operation}}{{/operations}}
