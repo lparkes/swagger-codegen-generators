@@ -50,6 +50,8 @@ type Configuration struct {
 	HTTPClient    *http.Client
 }
 
+// NewConfiguration creates a new Configuration with a default
+// BasePath and UserAgent.
 func NewConfiguration() *Configuration {
 	cfg := &Configuration{
 		BasePath:      "{{{basePath}}}",

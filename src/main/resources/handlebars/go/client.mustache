@@ -32,43 +32,20 @@ var (
 // APIClient manages communication with the {{appName}} API v{{version}}
 // In most cases there should be only one, shared, APIClient.
 type APIClient struct {
-	cfg    *Configuration
-	common service // Reuse a single struct instead of allocating one for each service on the heap.
-
-	// API Services
-{{#apiInfo}}
-{{#apis}}
-{{#operations}}
-
-	{{classname}} *{{classname}}Service
-{{/operations}}
-{{/apis}}
-{{/apiInfo}}
+	cfg Configuration
 }
 
-type service struct {
-	client *APIClient
-}
-
-// NewAPIClient creates a new API client. Requires a userAgent string describing your application.
-// optionally a custom http.Client to allow for advanced features such as caching.
+// NewAPIClient creates a new API client using the provided
+// configuration. If the configuration does not specify a http.Client
+// then http.DefaultClient is used.
+// Configurations are not shared between API clients.
 func NewAPIClient(cfg *Configuration) *APIClient {
 	if cfg.HTTPClient == nil {
 		cfg.HTTPClient = http.DefaultClient
 	}
 
 	c := &APIClient{}
-	c.cfg = cfg
-	c.common.client = c
-
-{{#apiInfo}}
-	// API Services
-{{#apis}}
-{{#operations}}
-	c.{{classname}} = (*{{classname}}Service)(&c.common)
-{{/operations}}
-{{/apis}}
-{{/apiInfo}}
+	c.cfg = *cfg
 
 	return c
 }

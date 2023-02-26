@@ -23,6 +23,21 @@ Put the package under your project folder and add the following in import:
 import "./{{packageName}}"
 ```
 
+```go
+package main
+
+import (
+	"context"
+
+	"{{packageName}}"
+)
+
+func main() {
+	client := {{packageName}}.NewAPIClient({{packageName}}.NewConfiguration())
+	client.DefaultApi.MibsKeysGet(context.TODO())
+}
+```
+
 ## Documentation for API Endpoints
 
 All URIs are relative to *{{basePath}}*
