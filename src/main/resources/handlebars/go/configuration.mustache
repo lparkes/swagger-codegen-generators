@@ -42,6 +42,8 @@ type APIKey struct {
 	Prefix string
 }
 
+// Configuration provides all of the information needed to configure
+// an APIClient.
 type Configuration struct {
 	BasePath      string            `json:"basePath,omitempty"`
 	Host          string            `json:"host,omitempty"`
@@ -62,6 +64,8 @@ func NewConfiguration() *Configuration {
 	return cfg
 }
 
+// AddDefaultHeader adds a new HTTP header that will be sent with
+// every HTTP request.
 func (c *Configuration) AddDefaultHeader(key string, value string) {
 	c.DefaultHeader[key] = value
 }
