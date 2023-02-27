@@ -8,6 +8,8 @@ import (
     "time"
 )
 
+// Logger is an HTTP handler that wraps another HTTP handler and
+// provides minimal access logging for that handler.
 func Logger(inner http.Handler, name string) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         start := time.Now()

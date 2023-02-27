@@ -19,6 +19,8 @@ type swaggerRoute struct {
 // API group to swaggerRoutes.
 var swaggerRoutes [][]swaggerRoute
 
+// NewRouter creates a new *mux.Router that contains all the routes for
+// the API.
 func NewRouter() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 	for _, apiGroup := range swaggerRoutes {
