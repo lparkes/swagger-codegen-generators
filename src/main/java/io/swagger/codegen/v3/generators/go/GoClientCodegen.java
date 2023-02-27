@@ -64,6 +64,7 @@ public class GoClientCodegen extends AbstractGoCodegen {
         this.supportingFiles.add(new SupportingFile("configuration.mustache", "", "configuration.go"));
         this.supportingFiles.add(new SupportingFile("client.mustache", "", "client.go"));
         this.supportingFiles.add(new SupportingFile("response.mustache", "", "response.go"));
+        this.supportingFiles.add(new SupportingFile("package.mustache", "", "package.go"));
         this.supportingFiles.add(new SupportingFile(".travis.yml", "", ".travis.yml"));
         if (this.additionalProperties.containsKey("withXml")) {
             this.setWithXml(Boolean.parseBoolean(this.additionalProperties.get("withXml").toString()));
