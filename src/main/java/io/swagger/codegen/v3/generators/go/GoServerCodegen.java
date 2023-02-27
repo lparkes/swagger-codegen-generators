@@ -100,6 +100,7 @@ public class GoServerCodegen extends AbstractGoCodegen {
         supportingFiles.add(new SupportingFile("main.mustache", "extra", "main.go"));
 	supportingFiles.add(new SupportingFile("routers.mustache", "", "routers.go"));
         supportingFiles.add(new SupportingFile("logger.mustache", "", "logger.go"));
+        supportingFiles.add(new SupportingFile("package.mustache", "", "package.go"));
         writeOptional(outputFolder, new SupportingFile("README.mustache", "", "README-server.md"));
     }
 
