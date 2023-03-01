@@ -354,7 +354,6 @@ public abstract class AbstractGoCodegen extends DefaultCodegenConfig {
             }
         }
 
-        boolean addedOptionalImport = false;
         boolean addedTimeImport = false;
         boolean addedOSImport = false;
         for (CodegenOperation operation : operations) {
@@ -366,24 +365,10 @@ public abstract class AbstractGoCodegen extends DefaultCodegenConfig {
                         addedOSImport = true;
                     }
 
-                    // import "time" if the operation has a required time parameter.
-                    if (param.required) {
-                        if (!addedTimeImport && param.dataType == "time.Time") {
-                            imports.add(createMapping("import", "time"));
-                            addedTimeImport = true;
-                        }
-                    } else {
-                        if (!addedOptionalImport) {
-                            imports.add(createMapping("import", "github.com/antihax/optional"));
-                            addedOptionalImport = true;
-                        }
-                        // We need to specially map Time type to the optionals package
-                        if (param.dataType == "time.Time") {
-                            param.vendorExtensions.put("x-optionalDataType", "Time");
-                            continue;
-                        }
-                        // Map optional type to dataType
-                        param.vendorExtensions.put("x-optionalDataType", param.dataType.substring(0, 1).toUpperCase() + param.dataType.substring(1));
+                    // import "time" if the operation has a time parameter.
+		    if (!addedTimeImport && param.dataType == "time.Time") {
+			imports.add(createMapping("import", "time"));
+			addedTimeImport = true;
                     }
                 }
             }
