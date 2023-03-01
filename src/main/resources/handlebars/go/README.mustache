@@ -61,22 +61,16 @@ Class | Method | HTTP request | Description
 
 Example
 ```golang
-auth := context.WithValue(context.Background(), sw.ContextAPIKey, sw.APIKey{
-	Key: "APIKEY",
-	Prefix: "Bearer", // Omit if not necessary.
-})
-r, err := client.Service.Operation(auth, args)
+client.SetAPIKey("APIKEY")
+r, err := client.Service().Operation(args)
 ```
 {{/isApiKey}}
 {{#isBasic}}- **Type**: HTTP basic authentication
 
 Example
 ```golang
-auth := context.WithValue(context.Background(), sw.ContextBasicAuth, sw.BasicAuth{
-	UserName: "username",
-	Password: "password",
-})
-r, err := client.Service.Operation(auth, args)
+client.SetBasicAuth("username", "password")
+r, err := client.Service().Operation(args)
 ```
 {{/isBasic}}
 {{#isOAuth}}- **Type**: OAuth
@@ -86,21 +80,23 @@ r, err := client.Service.Operation(auth, args)
 {{#each scopes}} - **{{@key}}**: {{this}}
 {{/each}}
 
-Example
+Example using an HTTP client from the oauth2 library to automatically
+refresh tokens and perform user authentication.
 ```golang
-auth := context.WithValue(context.Background(), sw.ContextAccessToken, "ACCESSTOKENSTRING")
-r, err := client.Service.Operation(auth, args)
-```
-
-Or via OAuth2 module to automatically refresh tokens and perform user authentication.
-```golang
-import "golang.org/x/oauth2"
+import (
+	"context"
+	"golang.org/x/oauth2"
+)
 
 /* Perform OAuth2 round trip request and obtain a token */
+conf := ... // a *oauth2.Config
+token := ... // your access token (*oauth2.Token)
+httpClient := conf.Client(context.Background(), token)
 
-tokenSource := oauth2cfg.TokenSource(createContext(httpClient), &token)
-auth := context.WithValue(oauth2.NoContext, sw.ContextOAuth2, tokenSource)
-r, err := client.Service.Operation(auth, args)
+cfg := NewConfiguration()
+cfg.HTTPClient = httpClient
+client := NewAPIClient(cfg)
+r, err := client.Service().Operation(args)
 ```
 {{/isOAuth}}
 {{/authMethods}}
