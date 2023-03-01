@@ -1,31 +1,13 @@
-{{>partial_header}}
 package {{packageName}}
+
+{{>partial_header}}
+
 {{#apiInfo}}
 
 import (
 	"net/http"
 )
-
-// This file should contain a full set of stub handlers for your web
-// server application. If it does, then you can just copy this file
-// into your application and start replacing the stubs with real code.
-
-// swagger-codegen has an interesting "feature" where API information is
-// not available to supporting files if you aren't also generating the
-// APIs at the same time. In that case this file will contain no
-// functions at all and you will need to copy and paste the stub handler
-// from the comment below into your code. The function names you need to
-// use are whatever undefined errors you get from compiling all the
-// api_X.go files.
-
-/*
-
-func STUB_HANDLER(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-}
-
-*/{{#apis}}
+{{#apis}}
 
 ////////////////////////////////////////////////////////////////////////////////
 //
@@ -36,4 +18,25 @@ func STUB_HANDLER(w http.ResponseWriter, r *http.Request) {
 func {{nickname}}(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
-}{{/operation}}{{/operations}}{{/apis}}{{/apiInfo}}
+}
+{{/operation}}{{/operations}}{{/apis}}
+{{^apis}}
+
+// If you are seeing this comment then you are using a version of
+// swagger-codegen that only collections API information when it is
+// generating the API source code (i.e. when -Dapis is specified on the
+// command line). This does make putting API related information (such as
+// API stubs) into supporting files a bit difficult.
+
+// Each stub looks like the following function. The STUB_HANDLER names
+// will be the long list of undefined names that Go will complain
+// about if you try compile your server without any stubs. Also, they'll
+// be the operation IDs from your OpenAPI spec if you have defined an
+// operation IDs.
+
+func STUB_HANDLER(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+}
+{{/apis}}
+{{/apiInfo}}

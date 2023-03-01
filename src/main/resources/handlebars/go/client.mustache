@@ -21,8 +21,6 @@ import (
 	"strings"
 	"time"
 	"unicode/utf8"
-
-	"golang.org/x/oauth2"
 )
 
 var (
@@ -33,7 +31,11 @@ var (
 // APIClient manages communication with the {{appName}} API v{{version}}
 // In most cases there should be only one, shared, APIClient.
 type APIClient struct {
-	cfg Configuration
+	cfg       Configuration
+	username  string
+	password  string
+	authToken string	// Only "Bearer" tokens are supported
+	apiKey    string
 }
 
 // NewAPIClient creates a new API client using the provided
@@ -49,6 +51,26 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.cfg = *cfg
 
 	return c
+}
+
+// SetBasicAuth records a username and password in an APIClient that
+// will be used to authorise all subsequent requests made by that
+// APIClient.
+func (c *APIClient) SetBasicAuth (username, password string) {
+	c.username = username
+	c.password = password
+}
+
+// SetBearerToken records a bearer token to be used to authorise all
+// subsequent requests made by that APIClient.
+func (c *APIClient) SetBearerToken (token string) {
+	c.authToken = "Bearer " + token
+}
+
+// SetAPIKey records an API key to be used to authorise all
+// subsequent requests made by that APIClient.
+func (c *APIClient) SetAPIKey (apiKey string) {
+	c.apiKey = apiKey
 }
 
 func atoi(in string) (int, error) {
@@ -260,29 +282,6 @@ func (c *APIClient) prepareRequest(
 	if ctx != nil {
 		// add context to the request
 		localVarRequest = localVarRequest.WithContext(ctx)
-
-		// Walk through any authentication.
-
-		// OAuth2 authentication
-		if tok, ok := ctx.Value(ContextOAuth2).(oauth2.TokenSource); ok {
-			// We were able to grab an oauth2 token from the context
-			var latestToken *oauth2.Token
-			if latestToken, err = tok.Token(); err != nil {
-				return nil, err
-			}
-
-			latestToken.SetAuthHeader(localVarRequest)
-		}
-
-		// Basic HTTP Authentication
-		if auth, ok := ctx.Value(ContextBasicAuth).(BasicAuth); ok {
-			localVarRequest.SetBasicAuth(auth.UserName, auth.Password)
-		}
-
-		// AccessToken Authentication
-		if auth, ok := ctx.Value(ContextAccessToken).(string); ok {
-			localVarRequest.Header.Add("Authorization", "Bearer "+auth)
-		}
 	}
 
 	for header, value := range c.cfg.DefaultHeader {
