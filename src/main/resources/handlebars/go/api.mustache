@@ -264,7 +264,7 @@ func (a *{{{classname}}}Service) {{{nickname}}}WithContext(ctx context.Context{{
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil {
+		if err != nil {
 			newErr := GenericSwaggerError{
 				body: localVarBody,
 				model: localVarReturnValue,
@@ -273,6 +273,7 @@ func (a *{{{classname}}}Service) {{{nickname}}}WithContext(ctx context.Context{{
 			}
 			return {{#returnType}}localVarReturnValue, {{/returnType}}newErr
 		}
+		return {{#returnType}}localVarReturnValue, {{/returnType}}nil
 	}
 	{{/returnType}}
 
