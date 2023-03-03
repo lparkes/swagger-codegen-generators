@@ -72,23 +72,12 @@ public class GoServerCodegen extends AbstractGoCodegen {
     public void processOpts() {
         super.processOpts();
 
-        if (additionalProperties.containsKey(CodegenConstants.PACKAGE_NAME)) {
-            setPackageName((String) additionalProperties.get(CodegenConstants.PACKAGE_NAME));
-        }
-        else {
-            setPackageName("swagger");
-        }
-
         /*
          * Additional Properties.  These values can be passed to the templates and
          * are available in models, apis, and supporting files
          */
         additionalProperties.put("apiVersion", apiVersion);
         additionalProperties.put("serverPort", serverPort);
-        additionalProperties.put(CodegenConstants.PACKAGE_NAME, packageName);
-
-        modelPackage = packageName;
-        apiPackage = packageName;
 
         /*
          * Supporting Files.  You can write single files for the generator with the

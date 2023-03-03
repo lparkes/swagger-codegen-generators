@@ -40,7 +40,8 @@ public abstract class AbstractGoCodegen extends DefaultCodegenConfig {
 
     protected boolean withXml = false;
 
-    protected String packageName = "swagger";
+    protected String modelPackageName; // Derived from the path in modelPackage
+    protected String apiPackageName;   // Derived from the path in apiPackage
 
     public AbstractGoCodegen() {
         super();
@@ -100,11 +101,27 @@ public abstract class AbstractGoCodegen extends DefaultCodegenConfig {
         importMapping = new HashMap<>();
 
         cliOptions.clear();
-        cliOptions.add(new CliOption(CodegenConstants.PACKAGE_NAME, "Go package name (convention: lowercase).")
-                .defaultValue("swagger"));
 
         cliOptions.add(new CliOption(CodegenConstants.HIDE_GENERATION_TIMESTAMP, CodegenConstants.HIDE_GENERATION_TIMESTAMP_DESC)
                 .defaultValue(Boolean.TRUE.toString()));
+    }
+
+    @Override
+    public void processOpts() {
+	// // Use the packagePath option to set defaults for the
+	// // options we really care about.
+	// if (additionalProperties.containsKey(PACKAGE_PATH)) {
+        //     apiPackage = (String) additionalProperties.get(PACKAGE_PATH);
+	//     modelPackage = (String) additionalProperties.get(PACKAGE_PATH);
+	// }
+	
+	super.processOpts();
+
+	// Derive package names from the package paths
+	apiPackageName = packagePathToName(apiPackage);
+	modelPackageName = packagePathToName(modelPackage);
+	additionalProperties.put("apiPackageName", apiPackageName);
+	additionalProperties.put("modelPackageName", modelPackageName);
     }
 
     /**
@@ -171,7 +188,11 @@ public abstract class AbstractGoCodegen extends DefaultCodegenConfig {
     public String toModelName(String name) {
         // camelize the model name
         // phone_number => PhoneNumber
-        return camelize(toModel(name));
+	if (modelPackage.equals(apiPackage)) {
+	    return camelize(toModel(name));
+	} else {
+	    return modelPackageName + "." + camelize(toModel(name));
+	}
     }
 
     @Override
@@ -342,9 +363,12 @@ public abstract class AbstractGoCodegen extends DefaultCodegenConfig {
         Iterator<Map<String, String>> iterator = imports.iterator();
         while (iterator.hasNext()) {
             String _import = iterator.next().get("import");
-            if (_import.startsWith(apiPackage()))
+            if (_import.startsWith(apiPackage()) || _import.startsWith(modelPackage()))
                 iterator.remove();
         }
+	if (!apiPackage.equals(modelPackage)) {
+	    imports.add(createMapping("import", modelPackage));
+	}
 
         // this will only import "fmt" if there are items in pathParams
         for (CodegenOperation operation : operations) {
@@ -459,10 +483,6 @@ public abstract class AbstractGoCodegen extends DefaultCodegenConfig {
         return !defaultIncludes.contains(type) && !languageSpecificPrimitives.contains(type);
     }
 
-    public void setPackageName(String packageName) {
-        this.packageName = packageName;
-    }
-
     @Override
     public String escapeQuotationMark(String input) {
         // remove " to avoid code injection
@@ -569,5 +589,22 @@ public abstract class AbstractGoCodegen extends DefaultCodegenConfig {
     @Override
     public boolean checkAliasModel() {
         return true;
+    }
+
+    /**
+     * packagePathToName converts a Go package path to a Go package
+     * name.  It does this by applying the convention that the last
+     * element of the package path is the package name.
+     *
+     * @param packagePath The package path to be parsed.
+     */
+    protected String packagePathToName(String packagePath) {
+	int index = packagePath.lastIndexOf('/');
+	
+	if (index == -1) {
+	    return packagePath;
+	} else {
+	    return packagePath.substring(index + 1);
+	}
     }
 }

@@ -39,24 +39,15 @@ public class GoClientCodegen extends AbstractGoCodegen {
     public void processOpts() {
         super.processOpts();
 
-        if (this.additionalProperties.containsKey("packageName")) {
-            this.setPackageName((String)this.additionalProperties.get("packageName"));
-        } else {
-            this.setPackageName("swagger");
-        }
-
         if (this.additionalProperties.containsKey("packageVersion")) {
             this.setPackageVersion((String)this.additionalProperties.get("packageVersion"));
         } else {
             this.setPackageVersion("1.0.0");
         }
 
-        this.additionalProperties.put("packageName", this.packageName);
         this.additionalProperties.put("packageVersion", this.packageVersion);
         this.additionalProperties.put("apiDocPath", this.apiDocPath);
         this.additionalProperties.put("modelDocPath", this.modelDocPath);
-        this.modelPackage = this.packageName;
-        this.apiPackage = this.packageName;
         this.supportingFiles.add(new SupportingFile("swagger.mustache", "api", "swagger.yaml"));
         this.supportingFiles.add(new SupportingFile("README.mustache", "", "README.md"));
         this.supportingFiles.add(new SupportingFile("git_push.sh.mustache", "", "git_push.sh"));
